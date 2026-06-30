@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Brand;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -12,34 +13,19 @@ class BrandSeeder extends Seeder
      */
     public function run(): void
     {
-        Brand::create([
-            'name' => 'Shell',
-            'logo' => 'shell.png',
-            'color' => '#FFD500'
-        ]);
+        $brands = [
+            ['name' => 'Shell', 'logo' => 'brand-icons/shell.png', 'color' => '#FFD500'],
+            ['name' => 'Petron', 'logo' => 'brand-icons/petron.png', 'color' => '#0057B8'],
+            ['name' => 'Caltex', 'logo' => 'brand-icons/caltex.jpg', 'color' => '#E30613'],
+            ['name' => 'Seaoil', 'logo' => 'brand-icons/seaoil.png', 'color' => '#003DA5'],
+            ['name' => 'Phoenix', 'logo' => 'brand-icons/phoenix.jpg', 'color' => '#FF6600'],
+        ];
 
-        Brand::create([
-            'name' => 'Petron',
-            'logo' => 'petron.png',
-            'color' => '#0057B8'
-        ]);
-
-        Brand::create([
-            'name' => 'Caltex',
-            'logo' => 'caltex.png',
-            'color' => '#E30613'
-        ]);
-
-        Brand::create([
-            'name' => 'Seaoil',
-            'logo' => 'seaoil.png',
-            'color' => '#003DA5'
-        ]);
-
-        Brand::create([
-            'name' => 'Phoenix',
-            'logo' => 'phoenix.png',
-            'color' => '#FF6600'
-        ]);
+        foreach ($brands as $brand) {
+            Brand::updateOrCreate(
+                ['name' => $brand['name']],
+                $brand
+            );
+        }
     }
 }

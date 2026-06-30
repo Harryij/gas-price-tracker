@@ -9,20 +9,17 @@ class FuelTypeSeeder extends Seeder
 {
     public function run(): void
     {
-
         $fuelTypes = [
-
-            ['name'=>'Regular'],
-            ['name'=>'Premium'],
-            ['name'=>'Diesel'],
-
+            ['name' => 'Regular', 'description' => 'Standard unleaded gasoline'],
+            ['name' => 'Premium', 'description' => 'Higher octane unleaded gasoline'],
+            ['name' => 'Diesel', 'description' => 'Diesel fuel for light and commercial vehicles'],
         ];
 
-        foreach($fuelTypes as $fuel){
-
-            FuelType::create($fuel);
-
+        foreach ($fuelTypes as $fuel) {
+            FuelType::updateOrCreate(
+                ['name' => $fuel['name']],
+                $fuel
+            );
         }
-
     }
 }

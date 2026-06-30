@@ -6,6 +6,8 @@
 
     <title>Gas Price Tracker</title>
 
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     @endif
@@ -14,14 +16,15 @@
         :root {
             color-scheme: light;
             font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            --ink: #172026;
-            --muted: #66727c;
-            --line: #dde4ea;
+            --ink: #202124;
+            --muted: #5f6368;
+            --line: #cfe7cf;
             --panel: #ffffff;
-            --soft: #f5f8fa;
-            --brand: #0f8b8d;
-            --accent: #f6ae2d;
-            --danger: #d1495b;
+            --primary: #90EE90;
+            --primary-dark: #176b35;
+            --primary-soft: #eefdee;
+            --green: #176b35;
+            --surface: #f4fbf4;
         }
 
         * {
@@ -30,686 +33,861 @@
 
         body {
             margin: 0;
-            background: #edf3f4;
-            color: var(--ink);
-        }
-
-        a {
-            color: inherit;
-            text-decoration: none;
-        }
-
-        .page {
             min-height: 100vh;
+            overflow: hidden;
+            color: var(--ink);
+            background: var(--surface);
         }
 
-        .topbar {
-            background: #ffffff;
-            border-bottom: 1px solid var(--line);
+        button,
+        input,
+        select {
+            font: inherit;
         }
 
-        .topbar-inner,
-        .shell {
-            width: min(1180px, calc(100% - 32px));
-            margin: 0 auto;
+        .map-shell,
+        #stationMap {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
         }
 
-        .topbar-inner {
-            min-height: 72px;
-            display: flex;
+        #stationMap {
+            z-index: 1;
+            background: #e8f8e8;
+        }
+
+        .leaflet-control-attribution {
+            font-size: 10px;
+        }
+
+        .search-panel {
+            position: absolute;
+            z-index: 500;
+            top: 18px;
+            left: 18px;
+            width: min(430px, calc(100vw - 36px));
+            display: grid;
+            gap: 10px;
+        }
+
+        .system-title {
+            position: absolute;
+            z-index: 510;
+            top: 18px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: min(520px, calc(100vw - 40px));
+            padding: 14px 20px;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, .94);
+            box-shadow: 0 2px 8px rgba(60, 64, 67, .22);
+            text-align: center;
+        }
+
+        .system-title h1 {
+            margin: 0;
+            color: #103b20;
+            font-size: 1.16rem;
+            line-height: 1.25;
+            font-weight: 800;
+        }
+
+        .search-box {
+            min-height: 56px;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
             align-items: center;
-            justify-content: space-between;
-            gap: 16px;
-        }
-
-        .brand-lockup {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            min-width: 0;
+            gap: 10px;
+            padding: 0 14px;
+            border-radius: 8px;
+            background: var(--panel);
+            box-shadow: 0 2px 8px rgba(60, 64, 67, .28);
         }
 
         .brand-mark {
-            width: 42px;
-            height: 42px;
+            width: 34px;
+            height: 34px;
             display: grid;
             place-items: center;
             border-radius: 8px;
-            background: var(--brand);
-            color: white;
+            background: var(--primary);
+            color: #103b20;
             font-weight: 800;
         }
 
-        .brand-lockup h1 {
-            margin: 0;
-            font-size: 1.08rem;
-            line-height: 1.2;
-        }
-
-        .brand-lockup p {
-            margin: 3px 0 0;
-            color: var(--muted);
-            font-size: .86rem;
-        }
-
-        .topbar-actions {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .button {
-            border: 1px solid var(--line);
-            background: #ffffff;
+        .search-box input {
+            min-width: 0;
+            height: 42px;
+            border: 0;
+            outline: 0;
             color: var(--ink);
-            padding: 10px 14px;
-            border-radius: 8px;
-            font-weight: 700;
-            font-size: .9rem;
-            white-space: nowrap;
+            font-size: .96rem;
         }
 
-        .button.primary {
-            background: var(--ink);
-            color: #ffffff;
-            border-color: var(--ink);
-        }
-
-        .shell {
-            padding: 28px 0 42px;
-        }
-
-        .hero {
-            display: grid;
-            grid-template-columns: minmax(0, 1.15fr) minmax(300px, .85fr);
-            gap: 18px;
-            align-items: stretch;
-        }
-
-        .intro,
-        .map-panel,
-        .toolbar,
-        .panel,
-        .empty-state {
-            background: var(--panel);
-            border: 1px solid var(--line);
-            border-radius: 8px;
-        }
-
-        .intro {
-            padding: 28px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            min-height: 288px;
-        }
-
-        .eyebrow {
-            margin: 0 0 12px;
-            color: var(--brand);
-            font-size: .78rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: .08em;
-        }
-
-        .intro h2 {
-            max-width: 720px;
-            margin: 0;
-            font-size: clamp(2rem, 4vw, 4rem);
-            line-height: 1.02;
-            letter-spacing: 0;
-        }
-
-        .intro-copy {
-            max-width: 680px;
-            margin: 18px 0 0;
-            color: var(--muted);
-            font-size: 1rem;
-            line-height: 1.7;
-        }
-
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 12px;
-            margin-top: 26px;
-        }
-
-        .stat {
-            min-height: 92px;
-            padding: 16px;
-            border: 1px solid var(--line);
-            border-radius: 8px;
-            background: var(--soft);
-        }
-
-        .stat strong {
-            display: block;
-            font-size: 1.55rem;
-            line-height: 1;
-        }
-
-        .stat span {
-            display: block;
-            margin-top: 8px;
-            color: var(--muted);
-            font-size: .86rem;
-        }
-
-        .map-panel {
-            padding: 16px;
-            min-height: 288px;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .map-preview {
-            position: relative;
-            flex: 1;
-            min-height: 230px;
-            overflow: hidden;
-            border-radius: 8px;
-            background:
-                linear-gradient(90deg, rgba(255,255,255,.62) 1px, transparent 1px),
-                linear-gradient(rgba(255,255,255,.62) 1px, transparent 1px),
-                #dbe9e7;
-            background-size: 44px 44px;
-        }
-
-        .road {
-            position: absolute;
-            height: 16px;
-            width: 130%;
-            left: -15%;
-            top: 52%;
-            border-radius: 999px;
-            background: #9fb7b5;
-            transform: rotate(-14deg);
-        }
-
-        .road.secondary {
-            top: 32%;
-            transform: rotate(24deg);
-            opacity: .75;
-        }
-
-        .pin {
-            position: absolute;
-            width: 18px;
-            height: 18px;
-            border: 3px solid white;
+        .icon-button {
+            width: 38px;
+            height: 38px;
+            border: 0;
             border-radius: 50%;
-            background: var(--accent);
-            box-shadow: 0 10px 24px rgba(23,32,38,.22);
-        }
-
-        .pin.one { left: 24%; top: 32%; }
-        .pin.two { left: 52%; top: 48%; background: var(--danger); }
-        .pin.three { left: 72%; top: 28%; background: var(--brand); }
-        .pin.four { left: 38%; top: 68%; background: #2f80ed; }
-
-        .map-caption {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            margin-top: 14px;
+            background: transparent;
             color: var(--muted);
-            font-size: .9rem;
+            cursor: pointer;
+            font-size: 1.25rem;
         }
 
-        .status-pill {
-            color: #0b5f61;
-            background: #e3f4f2;
-            border: 1px solid #b9dedb;
-            padding: 7px 10px;
+        .filter-row {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 2px;
+        }
+
+        .filter-row select,
+        .filter-row button {
+            min-height: 38px;
+            border: 1px solid var(--line);
             border-radius: 999px;
-            font-weight: 800;
-            font-size: .78rem;
+            padding: 0 14px;
+            background: var(--panel);
+            color: var(--ink);
+            box-shadow: 0 1px 4px rgba(60, 64, 67, .2);
             white-space: nowrap;
         }
 
-        .toolbar {
-            margin-top: 18px;
-            padding: 16px;
-            display: grid;
-            grid-template-columns: 1.5fr repeat(2, minmax(160px, .7fr)) auto;
-            gap: 12px;
-            align-items: end;
-        }
-
-        .field label {
-            display: block;
-            margin-bottom: 7px;
-            color: var(--muted);
-            font-size: .8rem;
-            font-weight: 800;
-        }
-
-        .field input,
-        .field select {
-            width: 100%;
-            min-height: 42px;
-            border: 1px solid var(--line);
-            border-radius: 8px;
-            padding: 0 12px;
-            color: var(--ink);
-            background: #ffffff;
-        }
-
-        .content-grid {
-            display: grid;
-            grid-template-columns: minmax(0, 1fr) 360px;
-            gap: 18px;
-            margin-top: 18px;
-            align-items: start;
-        }
-
-        .panel {
+        .results-panel {
+            position: absolute;
+            z-index: 480;
+            top: 126px;
+            left: 18px;
+            width: min(390px, calc(100vw - 36px));
+            max-height: calc(100vh - 150px);
             overflow: hidden;
-        }
-
-        .panel-header {
-            padding: 18px 18px 0;
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            gap: 14px;
-        }
-
-        .panel-header h3 {
-            margin: 0;
-            font-size: 1.05rem;
-        }
-
-        .panel-header p {
-            margin: 4px 0 0;
-            color: var(--muted);
-            font-size: .9rem;
-        }
-
-        .station-list {
-            display: grid;
-            gap: 12px;
-            padding: 18px;
-        }
-
-        .station-card {
-            display: grid;
-            grid-template-columns: 1fr auto;
-            gap: 16px;
-            padding: 16px;
-            border: 1px solid var(--line);
             border-radius: 8px;
-            background: #ffffff;
+            background: var(--panel);
+            box-shadow: 0 2px 8px rgba(60, 64, 67, .24);
+            display: flex;
+            flex-direction: column;
+            transition: width .2s ease, max-height .2s ease;
         }
 
-        .station-card[hidden] {
+        .results-panel.collapsed {
+            width: min(260px, calc(100vw - 36px));
+            max-height: 68px;
+        }
+
+        .results-panel.collapsed .station-list {
             display: none;
         }
 
-        .station-name {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            min-width: 0;
+        .results-panel.collapsed .results-header p {
+            display: none;
         }
 
-        .brand-dot {
-            width: 12px;
-            height: 12px;
+        .results-header {
+            padding: 16px 18px 10px;
+            border-bottom: 1px solid var(--line);
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 12px;
+            align-items: start;
+        }
+
+        .results-header h1 {
+            margin: 0;
+            font-size: 1rem;
+            line-height: 1.2;
+        }
+
+        .results-header p {
+            grid-column: 1 / -1;
+            margin: 5px 0 0;
+            color: var(--muted);
+            font-size: .84rem;
+        }
+
+        .collapse-results {
+            width: 32px;
+            height: 32px;
+            border: 1px solid var(--line);
             border-radius: 50%;
-            background: var(--brand-color, var(--brand));
-            box-shadow: 0 0 0 4px color-mix(in srgb, var(--brand-color, var(--brand)) 18%, transparent);
-            flex: 0 0 auto;
+            background: var(--primary-soft);
+            color: #103b20;
+            cursor: pointer;
+            font-size: 1.2rem;
+            line-height: 1;
         }
 
-        .station-name strong {
-            overflow-wrap: anywhere;
+        .collapse-results:hover,
+        .collapse-results:focus-visible {
+            background: var(--primary);
         }
 
-        .station-meta {
-            margin: 8px 0 0;
+        .station-list {
+            overflow-y: auto;
+            padding: 6px 0;
+        }
+
+        .station-result {
+            width: 100%;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 12px;
+            align-items: start;
+            border: 0;
+            border-bottom: 1px solid #edf0f2;
+            background: transparent;
+            padding: 14px 18px;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .station-result:hover,
+        .station-result.active {
+            background: var(--primary-soft);
+        }
+
+        .station-result[hidden] {
+            display: none;
+        }
+
+        .station-logo {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: #ffffff;
+            box-shadow: 0 0 0 2px rgba(255,255,255,.95), 0 1px 4px rgba(60,64,67,.22);
+            object-fit: contain;
+            padding: 4px;
+        }
+
+        .station-result strong {
+            display: block;
+            font-size: .94rem;
+            line-height: 1.25;
+        }
+
+        .station-result span {
+            display: block;
+            margin-top: 4px;
+            color: var(--muted);
+            font-size: .82rem;
+            line-height: 1.35;
+        }
+
+        .lowest-price {
+            color: var(--green);
+            font-weight: 800;
+            white-space: nowrap;
+            font-size: .9rem;
+        }
+
+        .station-div-icon {
+            overflow: visible;
+        }
+
+        .station-marker {
+            position: relative;
+            width: 44px;
+            height: 44px;
+            display: grid;
+            place-items: center;
+            border-radius: 50%;
+            background: #ffffff;
+            border: 3px solid var(--primary);
+            box-shadow: 0 3px 9px rgba(60,64,67,.34);
+            overflow: hidden;
+        }
+
+        .station-marker img {
+            width: 100%;
+            height: 100%;
+            max-width: 100%;
+            max-height: 100%;
+            display: block;
+            object-fit: contain;
+            padding: 3px;
+            border-radius: 50%;
+        }
+
+        .station-marker.active {
+            width: 52px;
+            height: 52px;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(144,238,144,.42), 0 6px 16px rgba(60,64,67,.42);
+        }
+
+        .station-marker-label {
+            position: absolute;
+            left: 50%;
+            top: 45px;
+            min-width: max-content;
+            transform: translateX(-50%);
+            padding: 5px 8px;
+            border-radius: 999px;
+            background: white;
+            box-shadow: 0 1px 4px rgba(60,64,67,.25);
+            font-size: .72rem;
+            font-weight: 800;
+            color: var(--ink);
+        }
+
+        .detail-panel {
+            position: absolute;
+            z-index: 520;
+            right: 18px;
+            top: 18px;
+            width: min(380px, calc(100vw - 36px));
+            max-height: calc(100vh - 36px);
+            overflow-y: auto;
+            border-radius: 8px;
+            background: var(--panel);
+            box-shadow: 0 2px 10px rgba(60, 64, 67, .3);
+            transform: translateX(calc(100% + 32px));
+            transition: transform .2s ease;
+        }
+
+        .detail-panel.open {
+            transform: translateX(0);
+        }
+
+        .detail-hero {
+            min-height: 116px;
+            padding: 16px;
+            color: white;
+            background:
+                linear-gradient(135deg, rgba(23,107,53,.08), rgba(23,107,53,.42)),
+                var(--station-color, var(--primary));
+        }
+
+        .detail-top {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .detail-close {
+            width: 34px;
+            height: 34px;
+            border: 0;
+            border-radius: 50%;
+            background: rgba(16,59,32,.16);
+            color: white;
+            cursor: pointer;
+            font-size: 1.15rem;
+        }
+
+        .detail-hero h2 {
+            margin: 18px 0 4px;
+            font-size: 1.35rem;
+            line-height: 1.18;
+        }
+
+        .detail-hero p {
+            margin: 0;
+            opacity: .9;
+            font-size: .9rem;
+        }
+
+        .detail-body {
+            padding: 16px;
+        }
+
+        .meta-line {
+            display: flex;
+            gap: 10px;
+            padding: 12px 0;
+            border-bottom: 1px solid #edf0f2;
             color: var(--muted);
             font-size: .9rem;
             line-height: 1.45;
         }
 
-        .price-chips {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: flex-end;
-            gap: 8px;
-            max-width: 340px;
+        .price-section {
+            margin-top: 16px;
         }
 
-        .chip {
-            border: 1px solid var(--line);
-            border-radius: 999px;
-            padding: 7px 10px;
-            background: var(--soft);
-            font-size: .82rem;
+        .price-section h3 {
+            margin: 0 0 10px;
+            font-size: .96rem;
+        }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0;
+            border-top: 1px solid #edf0f2;
+        }
+
+        .price-row span {
+            color: var(--muted);
+            display: block;
+            margin-top: 3px;
+            font-size: .78rem;
+        }
+
+        .price-row strong {
+            color: var(--green);
+            font-size: 1rem;
             white-space: nowrap;
         }
 
-        .chip strong {
-            margin-left: 4px;
+        .empty-note {
+            padding: 14px 18px;
+            color: var(--muted);
+            font-size: .9rem;
+            line-height: 1.5;
         }
 
-        .price-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 12px;
+        .zoom-controls {
+            position: absolute;
+            z-index: 490;
+            right: 18px;
+            bottom: 24px;
+            display: grid;
+            overflow: hidden;
+            border-radius: 8px;
+            box-shadow: 0 1px 4px rgba(60,64,67,.25);
         }
 
-        .price-table th,
-        .price-table td {
-            padding: 13px 18px;
-            border-top: 1px solid var(--line);
-            text-align: left;
-            vertical-align: top;
+        .zoom-controls button {
+            width: 42px;
+            height: 42px;
+            border: 0;
+            border-bottom: 1px solid var(--line);
+            background: white;
+            color: var(--ink);
+            font-size: 1.25rem;
+            cursor: pointer;
+        }
+
+        .zoom-controls button:last-child {
+            border-bottom: 0;
+        }
+
+        .database-warning,
+        .map-warning {
+            position: absolute;
+            z-index: 530;
+            left: 50%;
+            bottom: 24px;
+            width: min(540px, calc(100vw - 36px));
+            transform: translateX(-50%);
+            border-radius: 8px;
+            background: #fff8e1;
+            border: 1px solid #f3d47a;
+            padding: 12px 14px;
+            color: #5f4700;
+            box-shadow: 0 2px 8px rgba(60,64,67,.22);
             font-size: .9rem;
         }
 
-        .price-table th {
-            color: var(--muted);
-            font-size: .76rem;
-            text-transform: uppercase;
-            letter-spacing: .06em;
+        .map-warning[hidden] {
+            display: none;
         }
 
-        .price-value {
-            font-weight: 900;
-            color: #0b5f61;
-            white-space: nowrap;
-        }
-
-        .empty-state {
-            margin-top: 18px;
-            padding: 18px;
-            color: var(--muted);
-            line-height: 1.6;
-        }
-
-        .empty-state strong {
-            display: block;
-            color: var(--ink);
-            margin-bottom: 4px;
-        }
-
-        @media (max-width: 920px) {
-            .hero,
-            .content-grid,
-            .toolbar {
-                grid-template-columns: 1fr;
+        @media (max-width: 760px) {
+            body {
+                overflow: auto;
             }
 
-            .stats {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        @media (max-width: 640px) {
-            .topbar-inner,
-            .shell {
-                width: min(100% - 20px, 1180px);
+            .map-shell,
+            #stationMap {
+                min-height: 100vh;
+                height: 100svh;
             }
 
-            .topbar-inner,
-            .station-card,
-            .panel-header {
-                align-items: stretch;
-                flex-direction: column;
+            .search-panel {
+                top: 76px;
+                left: 10px;
+                width: calc(100vw - 20px);
             }
 
-            .topbar-actions,
-            .station-card {
-                display: grid;
-                grid-template-columns: 1fr;
+            .system-title {
+                top: 10px;
+                width: calc(100vw - 20px);
+                padding: 11px 14px;
             }
 
-            .button {
-                width: 100%;
-                text-align: center;
+            .system-title h1 {
+                font-size: .98rem;
             }
 
-            .intro {
-                padding: 20px;
+            .results-panel {
+                left: 10px;
+                right: 10px;
+                top: auto;
+                bottom: 0;
+                width: auto;
+                max-height: 42vh;
+                border-radius: 12px 12px 0 0;
             }
 
-            .price-chips {
-                justify-content: flex-start;
+            .detail-panel {
+                left: 10px;
+                right: 10px;
+                top: auto;
+                bottom: 10px;
+                width: auto;
+                max-height: 72vh;
+                transform: translateY(calc(100% + 24px));
             }
 
-            .price-table {
-                min-width: 520px;
+            .detail-panel.open {
+                transform: translateY(0);
             }
 
-            .table-scroll {
-                overflow-x: auto;
+            .zoom-controls {
+                right: 12px;
+                bottom: calc(42vh + 16px);
+            }
+
+            .station-marker-label {
+                display: none;
             }
         }
     </style>
 </head>
 <body>
-    <div class="page">
-        <header class="topbar">
-            <div class="topbar-inner">
-                <a class="brand-lockup" href="/">
-                    <span class="brand-mark">G</span>
-                    <span>
-                        <h1>Gas Price Tracker</h1>
-                        <p>Zamboanga City station prices</p>
-                    </span>
-                </a>
+    <main class="map-shell" aria-label="Zamboanga City gas station map">
+        <div id="stationMap"></div>
 
-                <div class="topbar-actions">
-                    <a class="button" href="#stations">Browse stations</a>
-                    <a class="button primary" href="#prices">Latest prices</a>
+        <section class="system-title" aria-label="System title">
+            <h1>Zamboanga City Fuel Market Monitoring</h1>
+        </section>
+
+        <section class="search-panel" aria-label="Search and filters">
+            <div class="search-box">
+                <span class="brand-mark">G</span>
+                <input id="stationSearch" type="search" placeholder="Search gas stations, brands, or streets" autocomplete="off">
+                <button class="icon-button" id="clearSearch" type="button" aria-label="Clear search">&times;</button>
+            </div>
+
+            <div class="filter-row">
+                <select id="brandFilter" aria-label="Filter by brand">
+                    <option>All brands</option>
+                    @foreach ($brands as $brand)
+                        <option>{{ $brand->name }}</option>
+                    @endforeach
+                </select>
+
+                <select id="fuelFilter" aria-label="Filter by fuel type">
+                    <option>All fuel types</option>
+                    @foreach ($fuelTypes as $fuelType)
+                        <option>{{ $fuelType->name }}</option>
+                    @endforeach
+                </select>
+
+                <button id="resetFilters" type="button">Reset</button>
+            </div>
+        </section>
+
+        <section class="results-panel" aria-label="Station results">
+            <div class="results-header">
+                <h1>Gas Price Tracker</h1>
+                <button class="collapse-results" id="toggleResults" type="button" aria-label="Minimize Gas Price Tracker card" aria-expanded="true">-</button>
+                <p><span id="resultCount">{{ $mapStations->count() }}</span> stations in Zamboanga City. Click a marker or station to view details.</p>
+            </div>
+
+            <div class="station-list">
+                @forelse ($mapStations as $station)
+                    <button
+                        class="station-result"
+                        type="button"
+                        data-station-result="{{ $station['id'] }}"
+                        style="--station-color: {{ $station['brandColor'] }}"
+                    >
+                        <img class="station-logo" src="{{ $station['brandIcon'] }}" alt="{{ $station['brand'] }} icon">
+                        <span>
+                            <strong>{{ $station['name'] }}</strong>
+                            <span>{{ $station['brand'] }} &middot; {{ $station['address'] }}</span>
+                        </span>
+                        <span class="lowest-price">
+                            {!! $station['lowestPrice'] ? '&#8369;'.$station['lowestPrice'] : '--' !!}
+                        </span>
+                    </button>
+                @empty
+                    <p class="empty-note">No stations are available yet. Add station seed data to populate the map.</p>
+                @endforelse
+            </div>
+        </section>
+
+        <aside class="detail-panel" id="stationDetail" aria-live="polite" aria-label="Station information">
+            <div class="detail-hero" id="detailHero">
+                <div class="detail-top">
+                    <span id="detailBrand">Select a station</span>
+                    <button class="detail-close" id="closeDetail" type="button" aria-label="Close station details">&times;</button>
+                </div>
+                <h2 id="detailName">Station details</h2>
+                <p id="detailSubtitle">Click a station marker to view prices and location.</p>
+            </div>
+
+            <div class="detail-body">
+                <div class="meta-line">
+                    <strong>Address</strong>
+                    <span id="detailAddress">No station selected</span>
+                </div>
+                <div class="meta-line">
+                    <strong>Coordinates</strong>
+                    <span id="detailCoordinates">--</span>
+                </div>
+
+                <div class="price-section">
+                    <h3>Fuel prices</h3>
+                    <div id="detailPrices">
+                        <p class="empty-note">Prices will appear here after selecting a station.</p>
+                    </div>
                 </div>
             </div>
-        </header>
+        </aside>
 
-        <main class="shell">
-            <section class="hero" aria-labelledby="page-title">
-                <div class="intro">
-                    <div>
-                        <p class="eyebrow">Local fuel watch</p>
-                        <h2 id="page-title">Compare nearby gas stations before you drive.</h2>
-                        <p class="intro-copy">
-                            A simple starting dashboard for checking stations, fuel types, and recent prices. The map area is reserved so the next version can become interactive without changing the whole layout.
-                        </p>
-                    </div>
+        <div class="zoom-controls" aria-label="Map controls">
+            <button id="zoomIn" type="button" aria-label="Zoom in">+</button>
+            <button id="zoomOut" type="button" aria-label="Zoom out">&minus;</button>
+        </div>
 
-                    <div class="stats" aria-label="Tracker summary">
-                        <div class="stat">
-                            <strong>{{ $stations->count() }}</strong>
-                            <span>Stations listed</span>
-                        </div>
-                        <div class="stat">
-                            <strong>{{ $brands->count() }}</strong>
-                            <span>Fuel brands</span>
-                        </div>
-                        <div class="stat">
-                            <strong>
-                                @if ($priceRange['min'] && $priceRange['max'])
-                                    ₱{{ number_format($priceRange['min'], 2) }}-₱{{ number_format($priceRange['max'], 2) }}
-                                @else
-                                    --
-                                @endif
-                            </strong>
-                            <span>Recorded price range</span>
-                        </div>
-                    </div>
-                </div>
+        <div class="map-warning" id="mapWarning" hidden>
+            The map library or map tiles could not load. Check your internet connection, then refresh the page.
+        </div>
 
-                <aside class="map-panel" aria-label="Map preview">
-                    <div class="map-preview">
-                        <span class="road"></span>
-                        <span class="road secondary"></span>
-                        <span class="pin one"></span>
-                        <span class="pin two"></span>
-                        <span class="pin three"></span>
-                        <span class="pin four"></span>
-                    </div>
-                    <div class="map-caption">
-                        <span>Map preview placeholder</span>
-                        <span class="status-pill">Map-ready layout</span>
-                    </div>
-                </aside>
-            </section>
+        @unless ($databaseReady)
+            <div class="database-warning">
+                Database is not ready yet. Start MySQL, run the migrations and seeders, then reload this page to show stations on the map.
+            </div>
+        @endunless
+    </main>
 
-            <section class="toolbar" aria-label="Station filters">
-                <div class="field">
-                    <label for="search">Search station or address</label>
-                    <input id="search" type="search" placeholder="Try Veterans Avenue">
-                </div>
-
-                <div class="field">
-                    <label for="brand">Brand</label>
-                    <select id="brand">
-                        <option>All brands</option>
-                        @foreach ($brands as $brand)
-                            <option>{{ $brand->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <div class="field">
-                    <label for="fuel">Fuel type</label>
-                    <select id="fuel">
-                        <option>All fuel types</option>
-                        @foreach ($fuelTypes as $fuelType)
-                            <option>{{ $fuelType->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <button class="button primary" type="button">Apply filters</button>
-            </section>
-
-            @unless ($databaseReady)
-                <div class="empty-state">
-                    <strong>Database is not ready yet.</strong>
-                    Once MySQL is running and migrations are seeded, this page will automatically show your stations, brands, and prices.
-                </div>
-            @endunless
-
-            <section class="content-grid">
-                <div class="panel" id="stations">
-                    <div class="panel-header">
-                        <div>
-                            <h3>Stations</h3>
-                            <p>Nearby locations prepared for the future map view.</p>
-                        </div>
-                    </div>
-
-                    <div class="station-list">
-                        @forelse ($stations as $station)
-                            <article
-                                class="station-card"
-                                data-station-card
-                                data-search="{{ Str::lower($station->name.' '.$station->address.' '.$station->city.' '.($station->brand->name ?? '')) }}"
-                                data-brand="{{ $station->brand->name ?? '' }}"
-                                data-fuels="{{ $station->fuelPrices->pluck('fuelType.name')->filter()->implode('|') }}"
-                            >
-                                <div>
-                                    <div class="station-name">
-                                        <span class="brand-dot" style="--brand-color: {{ $station->brand->color ?? '#0f8b8d' }}"></span>
-                                        <strong>{{ $station->name }}</strong>
-                                    </div>
-                                    <p class="station-meta">
-                                        {{ $station->brand->name ?? 'Unknown brand' }} · {{ $station->address }} · {{ $station->city }}
-                                    </p>
-                                </div>
-
-                                <div class="price-chips" aria-label="{{ $station->name }} prices">
-                                    @forelse ($station->fuelPrices->sortBy('fuelType.name')->take(3) as $price)
-                                        <span class="chip">
-                                            {{ $price->fuelType->name ?? 'Fuel' }}
-                                            <strong>₱{{ number_format($price->price, 2) }}</strong>
-                                        </span>
-                                    @empty
-                                        <span class="chip">No prices yet</span>
-                                    @endforelse
-                                </div>
-                            </article>
-                        @empty
-                            <div class="empty-state">
-                                <strong>No stations to show yet.</strong>
-                                Add seed data or create station records to populate this list.
-                            </div>
-                        @endforelse
-                    </div>
-                </div>
-
-                <aside class="panel" id="prices">
-                    <div class="panel-header">
-                        <div>
-                            <h3>Latest prices</h3>
-                            <p>Most recent recorded fuel prices.</p>
-                        </div>
-                    </div>
-
-                    <div class="table-scroll">
-                        <table class="price-table">
-                            <thead>
-                                <tr>
-                                    <th>Station</th>
-                                    <th>Fuel</th>
-                                    <th>Price</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse ($latestPrices as $price)
-                                    <tr>
-                                        <td>
-                                            <strong>{{ $price->station->name ?? 'Station' }}</strong><br>
-                                            <span style="color: var(--muted);">{{ $price->station->brand->name ?? 'Brand' }}</span>
-                                        </td>
-                                        <td>{{ $price->fuelType->name ?? 'Fuel' }}</td>
-                                        <td class="price-value">₱{{ number_format($price->price, 2) }}</td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="3">No price records yet.</td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
-                </aside>
-            </section>
-        </main>
-    </div>
-
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        const searchInput = document.querySelector('#search');
-        const brandSelect = document.querySelector('#brand');
-        const fuelSelect = document.querySelector('#fuel');
-        const filterButton = document.querySelector('.toolbar .button');
-        const stationCards = [...document.querySelectorAll('[data-station-card]')];
+        const stations = @json($mapStations);
+        const mapCenter = @json($mapCenter);
+        const mapBounds = @json($mapBounds);
+        const searchInput = document.querySelector('#stationSearch');
+        const clearSearch = document.querySelector('#clearSearch');
+        const brandFilter = document.querySelector('#brandFilter');
+        const fuelFilter = document.querySelector('#fuelFilter');
+        const resetFilters = document.querySelector('#resetFilters');
+        const resultsPanel = document.querySelector('.results-panel');
+        const toggleResults = document.querySelector('#toggleResults');
+        const resultCount = document.querySelector('#resultCount');
+        const detailPanel = document.querySelector('#stationDetail');
+        const detailHero = document.querySelector('#detailHero');
+        const detailBrand = document.querySelector('#detailBrand');
+        const detailName = document.querySelector('#detailName');
+        const detailSubtitle = document.querySelector('#detailSubtitle');
+        const detailAddress = document.querySelector('#detailAddress');
+        const detailCoordinates = document.querySelector('#detailCoordinates');
+        const detailPrices = document.querySelector('#detailPrices');
+        const closeDetail = document.querySelector('#closeDetail');
+        const zoomIn = document.querySelector('#zoomIn');
+        const zoomOut = document.querySelector('#zoomOut');
+        const mapWarning = document.querySelector('#mapWarning');
+        const resultButtons = [...document.querySelectorAll('[data-station-result]')];
+        const markers = {};
+        let map = null;
 
-        function applyStationFilters() {
-            const query = searchInput.value.trim().toLowerCase();
-            const brand = brandSelect.value;
-            const fuel = fuelSelect.value;
-
-            stationCards.forEach((card) => {
-                const matchesSearch = !query || card.dataset.search.includes(query);
-                const matchesBrand = brand === 'All brands' || card.dataset.brand === brand;
-                const fuels = card.dataset.fuels ? card.dataset.fuels.split('|') : [];
-                const matchesFuel = fuel === 'All fuel types' || fuels.includes(fuel);
-
-                card.hidden = !(matchesSearch && matchesBrand && matchesFuel);
-            });
+        function findStation(id) {
+            return stations.find((station) => String(station.id) === String(id));
         }
 
-        searchInput.addEventListener('input', applyStationFilters);
-        brandSelect.addEventListener('change', applyStationFilters);
-        fuelSelect.addEventListener('change', applyStationFilters);
-        filterButton.addEventListener('click', applyStationFilters);
+        function markerHtml(station) {
+            const label = station.lowestPrice ? `&#8369;${station.lowestPrice}` : station.brand;
+
+            return `
+                <div class="station-marker" style="--station-color: ${station.brandColor}; width: 44px; height: 44px;">
+                    <img src="${station.brandMapIcon}" alt="${station.brand} icon" style="width: 100%; height: 100%; max-width: 100%; max-height: 100%; object-fit: contain; padding: 3px;">
+                </div>
+                <div class="station-marker-label">${label}</div>
+            `;
+        }
+
+        function initializeMap() {
+            if (!window.L) {
+                mapWarning.hidden = false;
+                return;
+            }
+
+            const southWest = [mapBounds.southWest.latitude, mapBounds.southWest.longitude];
+            const northEast = [mapBounds.northEast.latitude, mapBounds.northEast.longitude];
+
+            map = L.map('stationMap', {
+                center: [mapCenter.latitude, mapCenter.longitude],
+                zoom: 13,
+                minZoom: 12,
+                maxZoom: 18,
+                zoomControl: false,
+                maxBounds: [southWest, northEast],
+                maxBoundsViscosity: 0.85,
+            });
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; OpenStreetMap contributors',
+            }).addTo(map);
+
+            stations.forEach((station) => {
+                const marker = L.marker([station.latitude, station.longitude], {
+                    icon: L.divIcon({
+                        className: 'station-div-icon',
+                        html: markerHtml(station),
+                        iconSize: [52, 68],
+                        iconAnchor: [26, 52],
+                    }),
+                    title: station.name,
+                });
+
+                marker.on('click', () => setActiveStation(station.id, true));
+                marker.addTo(map);
+                markers[station.id] = marker;
+            });
+
+            if (stations.length) {
+                const bounds = L.latLngBounds(stations.map((station) => [station.latitude, station.longitude]));
+                map.fitBounds(bounds.pad(0.35), { maxZoom: 15 });
+            }
+        }
+
+        function matchesFilters(station) {
+            const query = searchInput.value.trim().toLowerCase();
+            const brand = brandFilter.value;
+            const fuel = fuelFilter.value;
+            const matchesSearch = !query || station.searchText.includes(query);
+            const matchesBrand = brand === 'All brands' || station.brand === brand;
+            const matchesFuel = fuel === 'All fuel types' || station.fuelTypes.includes(fuel);
+
+            return matchesSearch && matchesBrand && matchesFuel;
+        }
+
+        function applyFilters() {
+            let visibleCount = 0;
+            const visibleLocations = [];
+
+            stations.forEach((station) => {
+                const visible = matchesFilters(station);
+                const result = document.querySelector(`[data-station-result="${station.id}"]`);
+                const marker = markers[station.id];
+
+                if (result) result.hidden = !visible;
+
+                if (marker && map) {
+                    if (visible && !map.hasLayer(marker)) marker.addTo(map);
+                    if (!visible && map.hasLayer(marker)) marker.remove();
+                }
+
+                if (visible) {
+                    visibleCount += 1;
+                    visibleLocations.push([station.latitude, station.longitude]);
+                }
+            });
+
+            resultCount.textContent = visibleCount;
+
+            if (map && visibleLocations.length) {
+                const bounds = L.latLngBounds(visibleLocations);
+                map.fitBounds(bounds.pad(0.35), { maxZoom: 15, animate: true });
+            }
+        }
+
+        function setActiveStation(id, moveMap = false) {
+            const station = findStation(id);
+            if (!station) return;
+
+            resultButtons.forEach((button) => button.classList.toggle('active', button.dataset.stationResult === String(id)));
+
+            Object.entries(markers).forEach(([markerId, marker]) => {
+                const element = marker.getElement();
+                const shape = element ? element.querySelector('.station-marker') : null;
+                if (shape) shape.classList.toggle('active', markerId === String(id));
+            });
+
+            if (moveMap && map) {
+                map.panTo([station.latitude, station.longitude], { animate: true });
+            }
+
+            detailHero.style.setProperty('--station-color', station.brandColor);
+            detailBrand.textContent = station.brand;
+            detailName.textContent = station.name;
+            detailSubtitle.textContent = station.city;
+            detailAddress.textContent = station.address;
+            detailCoordinates.textContent = `${station.latitude.toFixed(6)}, ${station.longitude.toFixed(6)}`;
+
+            if (station.prices.length) {
+                detailPrices.innerHTML = station.prices.map((price) => `
+                    <div class="price-row">
+                        <div>
+                            ${price.fuel}
+                            <span>Updated ${price.effectiveAt}</span>
+                        </div>
+                        <strong>&#8369;${price.price}</strong>
+                    </div>
+                `).join('');
+            } else {
+                detailPrices.innerHTML = '<p class="empty-note">No prices have been recorded for this station yet.</p>';
+            }
+
+            detailPanel.classList.add('open');
+        }
+
+        resultButtons.forEach((button) => {
+            button.addEventListener('click', () => setActiveStation(button.dataset.stationResult, true));
+        });
+
+        [searchInput, brandFilter, fuelFilter].forEach((control) => {
+            control.addEventListener('input', applyFilters);
+            control.addEventListener('change', applyFilters);
+        });
+
+        clearSearch.addEventListener('click', () => {
+            searchInput.value = '';
+            applyFilters();
+            searchInput.focus();
+        });
+
+        resetFilters.addEventListener('click', () => {
+            searchInput.value = '';
+            brandFilter.value = 'All brands';
+            fuelFilter.value = 'All fuel types';
+            applyFilters();
+        });
+
+        closeDetail.addEventListener('click', () => {
+            detailPanel.classList.remove('open');
+            resultButtons.forEach((button) => button.classList.remove('active'));
+
+            Object.values(markers).forEach((marker) => {
+                const element = marker.getElement();
+                const shape = element ? element.querySelector('.station-marker') : null;
+                if (shape) shape.classList.remove('active');
+            });
+        });
+
+        function setResultsPanelMinimized(isMinimized) {
+            resultsPanel.classList.toggle('collapsed', isMinimized);
+            toggleResults.textContent = isMinimized ? '+' : '-';
+            toggleResults.setAttribute('aria-expanded', String(!isMinimized));
+            toggleResults.setAttribute(
+                'aria-label',
+                isMinimized ? 'Expand Gas Price Tracker card' : 'Minimize Gas Price Tracker card'
+            );
+        }
+
+        toggleResults.addEventListener('click', () => {
+            setResultsPanelMinimized(!resultsPanel.classList.contains('collapsed'));
+        });
+
+        zoomIn.addEventListener('click', () => {
+            if (map) map.zoomIn();
+        });
+
+        zoomOut.addEventListener('click', () => {
+            if (map) map.zoomOut();
+        });
+
+        initializeMap();
+        applyFilters();
     </script>
 </body>
 </html>

@@ -18,14 +18,13 @@ class StationSeeder extends Seeder
 
 
         $stations = [
-
             [
                 'brand_id' => $shell->id,
                 'name' => 'Shell Divisoria',
                 'address' => 'Divisoria Road',
                 'city' => 'Zamboanga City',
-                'latitude' => 6.9134950,
-                'longitude' => 122.0798100,
+                'latitude' => 6.948241966253915,
+                'longitude' => 122.10920892657074,
             ],
 
             [
@@ -33,8 +32,8 @@ class StationSeeder extends Seeder
                 'name' => 'Shell Veterans',
                 'address' => 'Veterans Avenue',
                 'city' => 'Zamboanga City',
-                'latitude' => 6.9213000,
-                'longitude' => 122.0789000,
+                'latitude' => 6.9147843372218984,
+                'longitude' => 122.07974308808545,
             ],
 
             [
@@ -42,17 +41,17 @@ class StationSeeder extends Seeder
                 'name' => 'Petron Tetuan',
                 'address' => 'Tetuan Highway',
                 'city' => 'Zamboanga City',
-                'latitude' => 6.9218000,
-                'longitude' => 122.0912000,
+                'latitude' => 6.928226714623714,
+                'longitude' => 122.08997666883874,
             ],
 
             [
                 'brand_id' => $petron->id,
-                'name' => 'Petron Guiwan',
-                'address' => 'Guiwan Highway',
+                'name' => 'Petron Gas Station',
+                'address' => 'MCLL Highway',
                 'city' => 'Zamboanga City',
-                'latitude' => 6.8971000,
-                'longitude' => 122.0841000,
+                'latitude' => 6.927322822475103,
+                'longitude' => 122.08527112086514,
             ],
 
             [
@@ -81,12 +80,13 @@ class StationSeeder extends Seeder
                 'latitude' => 6.9346000,
                 'longitude' => 122.0549000,
             ],
-
         ];
+
         foreach ($stations as $station) {
-
-            Station::create($station);
-
+            Station::updateOrCreate(
+                ['name' => $station['name']],
+                $station
+            );
         }
     }
 }

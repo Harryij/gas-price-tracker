@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96" role="img" aria-label="Shell placeholder icon">
+  <rect width="96" height="96" rx="24" fill="#90EE90"/>
+  <circle cx="48" cy="48" r="34" fill="#FFD500"/>
+  <path d="M27 56c2-18 10-30 21-30s19 12 21 30H27Z" fill="#F14C38"/>
+  <path d="M28 61h40v9H28z" fill="#F14C38"/>
+  <path d="M48 28v28M37 33l8 23M59 33l-8 23" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round"/>
+</svg>
