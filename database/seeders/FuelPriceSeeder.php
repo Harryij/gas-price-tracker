@@ -16,13 +16,18 @@ class FuelPriceSeeder extends Seeder
     {
         $prices = [
             'Shell Divisoria' => ['Regular' => 63.25, 'Premium' => 68.40, 'Diesel' => 58.70],
-            'Shell Veterans' => ['Regular' => 63.55, 'Premium' => 68.75, 'Diesel' => 58.95],
+            'Shell Veterans' => ['Regular' => 63.55, 'Premium' => 58.75, 'Diesel' => 58.95],
             'Petron Tetuan' => ['Regular' => 62.90, 'Premium' => 67.80, 'Diesel' => 58.40],
-            'Petron Guiwan' => ['Regular' => 62.75, 'Premium' => 67.65, 'Diesel' => 58.20],
-            'Petron Gas Station' => ['Regular' => 62.75, 'Premium' => 67.65, 'Diesel' => 58.20],
-            'Caltex Veterans' => ['Regular' => 63.10, 'Premium' => 68.05, 'Diesel' => 58.55],
-            'Phoenix Tumaga' => ['Regular' => 62.45, 'Premium' => 67.30, 'Diesel' => 57.95],
-            'Seaoil Putik' => ['Regular' => 62.35, 'Premium' => 67.15, 'Diesel' => 57.85],
+            'Petron Tumaga' => ['Regular' => 82.90, 'Premium' => 67.80, 'Diesel' => 58.40],
+            'Petron (Gov Ramos Avenue)' => ['Regular' => 62.90, 'Premium' => 67.80, 'Diesel' => 58.40],
+            'Petron (Fronting Baliwasan Brgy Hall)' => ['Regular' => 62.90, 'Premium' => 67.80, 'Diesel' => 58.40],
+            'Petron Centenarian' => ['Regular' => 62.90, 'Premium' => 67.80, 'Diesel' => 58.40],
+            'Petron Veterans' => ['Regular' => 62.90, 'Premium' => 67.80, 'Diesel' => 58.40],
+            'Petron (MCLL Hwy)' => ['Regular' => 62.75, 'Premium' => 67.65, 'Diesel' => 58.20],
+            'Petron (San Jose Road)' => ['Regular' => 62.75, 'Premium' => 67.65, 'Diesel' => 58.20],
+            'Caltex Nuñez' => ['Regular' => 63.10, 'Premium' => 72.05, 'Diesel' => 58.55],
+            'Phoenix Tumaga' => ['Regular' => 62.45, 'Premium' => 67.30, 'Diesel' => 80.95],
+            'Seaoil Putik' => ['Regular' => 62.35, 'Premium' => 67.15, 'Diesel' => 52.85],
         ];
 
         foreach ($prices as $stationName => $fuelPrices) {

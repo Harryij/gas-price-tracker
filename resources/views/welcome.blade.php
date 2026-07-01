@@ -7,6 +7,7 @@
     <title>Gas Price Tracker</title>
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet">
 
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
         @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -75,23 +76,20 @@
             position: absolute;
             z-index: 510;
             top: 18px;
-            left: 50%;
+            left: 85%;
             transform: translateX(-50%);
             width: min(520px, calc(100vw - 40px));
             padding: 14px 20px;
-            border: 1px solid var(--line);
-            border-radius: 12px;
-            background: rgba(255, 255, 255, .94);
-            box-shadow: 0 2px 8px rgba(60, 64, 67, .22);
             text-align: center;
         }
 
         .system-title h1 {
             margin: 0;
             color: #103b20;
-            font-size: 1.16rem;
+            font-size: 1.60rem;
             line-height: 1.25;
             font-weight: 800;
+            font-family: "Satisfy", cursive;
         }
 
         .search-box {
@@ -109,12 +107,9 @@
         .brand-mark {
             width: 34px;
             height: 34px;
-            display: grid;
-            place-items: center;
             border-radius: 8px;
-            background: var(--primary);
-            color: #103b20;
-            font-weight: 800;
+            display: block;
+            object-fit: contain;
         }
 
         .search-box input {
@@ -181,6 +176,14 @@
             display: none;
         }
 
+        .results-panel.collapsed .stations-section {
+            display: none;
+        }
+
+        .results-panel.collapsed .price-comparison {
+            display: none;
+        }
+
         .results-panel.collapsed .results-header p {
             display: none;
         }
@@ -207,6 +210,101 @@
             font-size: .84rem;
         }
 
+        .price-comparison {
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--line);
+            background: #fbfffb;
+        }
+
+        .price-comparison.collapsed .comparison-list {
+            display: none;
+        }
+
+        .comparison-header {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .price-comparison.collapsed .comparison-header {
+            margin-bottom: 0;
+        }
+
+        .price-comparison h2 {
+            margin: 0;
+            color: #103b20;
+            font-size: .96rem;
+            line-height: 1.2;
+        }
+
+        .comparison-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .comparison-item {
+            width: 100%;
+            display: grid;
+            gap: 7px;
+            padding: 10px;
+            border: 1px solid #edf0f2;
+            border-radius: 8px;
+            background: white;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .comparison-item:hover,
+        .comparison-item:focus-visible,
+        .comparison-item.active {
+            border-color: var(--primary);
+            background: var(--primary-soft);
+            outline: 0;
+        }
+
+        .comparison-fuel {
+            margin: 0;
+            font-size: .84rem;
+            font-weight: 800;
+            color: var(--ink);
+        }
+
+        .comparison-extremes {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .comparison-extreme {
+            min-width: 0;
+            display: grid;
+            gap: 2px;
+        }
+
+        .comparison-extreme span {
+            color: var(--muted);
+            font-size: .7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .comparison-extreme strong {
+            color: var(--green);
+            font-size: .9rem;
+            line-height: 1.2;
+        }
+
+        .comparison-extreme small {
+            overflow: hidden;
+            color: var(--muted);
+            font-size: .72rem;
+            line-height: 1.25;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
         .collapse-results {
             width: 32px;
             height: 32px;
@@ -224,7 +322,47 @@
             background: var(--primary);
         }
 
+        .stations-section {
+            min-height: 0;
+            display: flex;
+            flex: 1 1 auto;
+            flex-direction: column;
+            border-bottom: 1px solid var(--line);
+            background: white;
+        }
+
+        .stations-section.collapsed {
+            flex: 0 0 auto;
+        }
+
+        .stations-section.collapsed .station-list {
+            display: none;
+        }
+
+        .stations-header {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 12px;
+            align-items: center;
+            padding: 12px 18px;
+            border-bottom: 1px solid #edf0f2;
+            background: #ffffff;
+        }
+
+        .stations-section.collapsed .stations-header {
+            border-bottom: 0;
+        }
+
+        .stations-header h2 {
+            margin: 0;
+            color: #103b20;
+            font-size: .96rem;
+            line-height: 1.2;
+        }
+
         .station-list {
+            min-height: 0;
+            flex: 1 1 auto;
             overflow-y: auto;
             padding: 6px 0;
         }
@@ -318,19 +456,49 @@
             box-shadow: 0 0 0 4px rgba(144,238,144,.42), 0 6px 16px rgba(60,64,67,.42);
         }
 
+        .station-marker.lowest-comparison {
+            border-color: #188038;
+            box-shadow: 0 0 0 4px rgba(24,128,56,.24), 0 6px 16px rgba(60,64,67,.42);
+        }
+
+        .station-marker.highest-comparison {
+            border-color: #b3261e;
+            box-shadow: 0 0 0 4px rgba(179,38,30,.22), 0 6px 16px rgba(60,64,67,.42);
+        }
+
+        .station-marker.lowest-comparison.highest-comparison {
+            border-color: #176b35;
+            box-shadow: 0 0 0 4px rgba(23,107,53,.3), 0 6px 16px rgba(60,64,67,.42);
+        }
+
         .station-marker-label {
             position: absolute;
             left: 50%;
             top: 45px;
-            min-width: max-content;
+            min-width: 132px;
             transform: translateX(-50%);
-            padding: 5px 8px;
-            border-radius: 999px;
+            display: grid;
+            gap: 2px;
+            padding: 6px 8px;
+            border-radius: 8px;
             background: white;
             box-shadow: 0 1px 4px rgba(60,64,67,.25);
-            font-size: .72rem;
+            font-size: .68rem;
             font-weight: 800;
             color: var(--ink);
+        }
+
+        .marker-price-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            line-height: 1.2;
+            white-space: nowrap;
+        }
+
+        .marker-price-row span:first-child {
+            color: var(--muted);
+            font-weight: 700;
         }
 
         .detail-panel {
@@ -546,7 +714,10 @@
             }
 
             .station-marker-label {
-                display: none;
+                min-width: 112px;
+                top: 42px;
+                padding: 5px 7px;
+                font-size: .62rem;
             }
         }
     </style>
@@ -561,7 +732,7 @@
 
         <section class="search-panel" aria-label="Search and filters">
             <div class="search-box">
-                <span class="brand-mark">G</span>
+                <img class="brand-mark" src="{{ asset('brand-icons/gas-map-search-icon.png') }}" alt="Gas map icon">
                 <input id="stationSearch" type="search" placeholder="Search gas stations, brands, or streets" autocomplete="off">
                 <button class="icon-button" id="clearSearch" type="button" aria-label="Clear search">&times;</button>
             </div>
@@ -587,32 +758,49 @@
 
         <section class="results-panel" aria-label="Station results">
             <div class="results-header">
-                <h1>Gas Price Tracker</h1>
+                <h1>Gas Price Dashboard</h1>
                 <button class="collapse-results" id="toggleResults" type="button" aria-label="Minimize Gas Price Tracker card" aria-expanded="true">-</button>
                 <p><span id="resultCount">{{ $mapStations->count() }}</span> stations in Zamboanga City. Click a marker or station to view details.</p>
             </div>
 
-            <div class="station-list">
-                @forelse ($mapStations as $station)
-                    <button
-                        class="station-result"
-                        type="button"
-                        data-station-result="{{ $station['id'] }}"
-                        style="--station-color: {{ $station['brandColor'] }}"
-                    >
-                        <img class="station-logo" src="{{ $station['brandIcon'] }}" alt="{{ $station['brand'] }} icon">
-                        <span>
-                            <strong>{{ $station['name'] }}</strong>
-                            <span>{{ $station['brand'] }} &middot; {{ $station['address'] }}</span>
-                        </span>
-                        <span class="lowest-price">
-                            {!! $station['lowestPrice'] ? '&#8369;'.$station['lowestPrice'] : '--' !!}
-                        </span>
-                    </button>
-                @empty
-                    <p class="empty-note">No stations are available yet. Add station seed data to populate the map.</p>
-                @endforelse
-            </div>
+            <section class="price-comparison" id="priceComparisonSection" aria-label="Price comparison">
+                <div class="comparison-header">
+                    <h2>Price Comparison</h2>
+                    <button class="collapse-results" id="toggleComparison" type="button" aria-label="Minimize Price Comparison section" aria-expanded="true">-</button>
+                </div>
+                <div class="comparison-list" id="priceComparison">
+                    <p class="empty-note">No station prices are available yet.</p>
+                </div>
+            </section>
+
+            <section class="stations-section" id="stationsSection" aria-label="Stations">
+                <div class="stations-header">
+                    <h2>Stations</h2>
+                    <button class="collapse-results" id="toggleStations" type="button" aria-label="Minimize Stations section" aria-expanded="true">-</button>
+                </div>
+
+                <div class="station-list">
+                    @forelse ($mapStations as $station)
+                        <button
+                            class="station-result"
+                            type="button"
+                            data-station-result="{{ $station['id'] }}"
+                            style="--station-color: {{ $station['brandColor'] }}"
+                        >
+                            <img class="station-logo" src="{{ $station['brandIcon'] }}" alt="{{ $station['brand'] }} icon">
+                            <span>
+                                <strong>{{ $station['name'] }}</strong>
+                                <span>{{ $station['brand'] }} &middot; {{ $station['address'] }}</span>
+                            </span>
+                            <span class="lowest-price">
+                                View Station Prices
+                            </span>
+                        </button>
+                    @empty
+                        <p class="empty-note">No stations are available yet. Add station seed data to populate the map.</p>
+                    @endforelse
+                </div>
+            </section>
         </section>
 
         <aside class="detail-panel" id="stationDetail" aria-live="polite" aria-label="Station information">
@@ -673,6 +861,8 @@
         const resultsPanel = document.querySelector('.results-panel');
         const toggleResults = document.querySelector('#toggleResults');
         const resultCount = document.querySelector('#resultCount');
+        const stationsSection = document.querySelector('#stationsSection');
+        const toggleStations = document.querySelector('#toggleStations');
         const detailPanel = document.querySelector('#stationDetail');
         const detailHero = document.querySelector('#detailHero');
         const detailBrand = document.querySelector('#detailBrand');
@@ -686,6 +876,9 @@
         const zoomOut = document.querySelector('#zoomOut');
         const mapWarning = document.querySelector('#mapWarning');
         const resultButtons = [...document.querySelectorAll('[data-station-result]')];
+        const priceComparisonSection = document.querySelector('#priceComparisonSection');
+        const priceComparison = document.querySelector('#priceComparison');
+        const toggleComparison = document.querySelector('#toggleComparison');
         const markers = {};
         let map = null;
 
@@ -694,7 +887,14 @@
         }
 
         function markerHtml(station) {
-            const label = station.lowestPrice ? `&#8369;${station.lowestPrice}` : station.brand;
+            const label = station.prices.length
+                ? station.prices.map((price) => `
+                    <div class="marker-price-row">
+                        <span>${price.fuel}</span>
+                        <strong>&#8369;${price.price}</strong>
+                    </div>
+                `).join('')
+                : `<div class="marker-price-row"><span>${station.brand}</span><strong>No prices</strong></div>`;
 
             return `
                 <div class="station-marker" style="--station-color: ${station.brandColor}; width: 44px; height: 44px;">
@@ -723,9 +923,9 @@
                 maxBoundsViscosity: 0.85,
             });
 
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
                 maxZoom: 19,
-                attribution: '&copy; OpenStreetMap contributors',
+                attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
             }).addTo(map);
 
             stations.forEach((station) => {
@@ -761,9 +961,72 @@
             return matchesSearch && matchesBrand && matchesFuel;
         }
 
+        function escapeHtml(value) {
+            return String(value)
+                .replaceAll('&', '&amp;')
+                .replaceAll('<', '&lt;')
+                .replaceAll('>', '&gt;')
+                .replaceAll('"', '&quot;')
+                .replaceAll("'", '&#039;');
+        }
+
+        function updatePriceComparison(visibleStations) {
+            const pricesByFuel = new Map();
+
+            visibleStations.forEach((station) => {
+                station.prices.forEach((price) => {
+                    const fuelPrices = pricesByFuel.get(price.fuel) || [];
+                    fuelPrices.push({
+                        fuel: price.fuel,
+                        price: Number(price.rawPrice),
+                        formattedPrice: price.price,
+                        stationId: station.id,
+                        station: station.name,
+                    });
+                    pricesByFuel.set(price.fuel, fuelPrices);
+                });
+            });
+
+            const comparisonRows = [...pricesByFuel.entries()]
+                .sort(([fuelA], [fuelB]) => fuelA.localeCompare(fuelB))
+                .map(([fuel, prices]) => {
+                    const lowest = prices.reduce((best, current) => current.price < best.price ? current : best);
+                    const highest = prices.reduce((best, current) => current.price > best.price ? current : best);
+
+                    return `
+                        <button
+                            class="comparison-item"
+                            type="button"
+                            data-comparison-card
+                            data-lowest-station="${lowest.stationId}"
+                            data-highest-station="${highest.stationId}"
+                        >
+                            <h3 class="comparison-fuel">${escapeHtml(fuel)}</h3>
+                            <div class="comparison-extremes">
+                                <div class="comparison-extreme">
+                                    <span>Lowest</span>
+                                    <strong>&#8369;${lowest.formattedPrice}</strong>
+                                    <small title="${escapeHtml(lowest.station)}">${escapeHtml(lowest.station)}</small>
+                                </div>
+                                <div class="comparison-extreme">
+                                    <span>Highest</span>
+                                    <strong>&#8369;${highest.formattedPrice}</strong>
+                                    <small title="${escapeHtml(highest.station)}">${escapeHtml(highest.station)}</small>
+                                </div>
+                            </div>
+                        </button>
+                    `;
+                });
+
+            priceComparison.innerHTML = comparisonRows.length
+                ? comparisonRows.join('')
+                : '<p class="empty-note">No matching station prices are available.</p>';
+        }
+
         function applyFilters() {
             let visibleCount = 0;
             const visibleLocations = [];
+            const visibleStations = [];
 
             stations.forEach((station) => {
                 const visible = matchesFilters(station);
@@ -780,10 +1043,12 @@
                 if (visible) {
                     visibleCount += 1;
                     visibleLocations.push([station.latitude, station.longitude]);
+                    visibleStations.push(station);
                 }
             });
 
             resultCount.textContent = visibleCount;
+            updatePriceComparison(visibleStations);
 
             if (map && visibleLocations.length) {
                 const bounds = L.latLngBounds(visibleLocations);
@@ -795,12 +1060,21 @@
             const station = findStation(id);
             if (!station) return;
 
+            const selectedMarker = markers[station.id];
+            if (selectedMarker && map && !map.hasLayer(selectedMarker)) {
+                selectedMarker.addTo(map);
+            }
+
+            document.querySelectorAll('[data-comparison-card]').forEach((card) => card.classList.remove('active'));
             resultButtons.forEach((button) => button.classList.toggle('active', button.dataset.stationResult === String(id)));
 
             Object.entries(markers).forEach(([markerId, marker]) => {
                 const element = marker.getElement();
                 const shape = element ? element.querySelector('.station-marker') : null;
-                if (shape) shape.classList.toggle('active', markerId === String(id));
+                if (shape) {
+                    shape.classList.toggle('active', markerId === String(id));
+                    shape.classList.remove('lowest-comparison', 'highest-comparison');
+                }
             });
 
             if (moveMap && map) {
@@ -831,8 +1105,62 @@
             detailPanel.classList.add('open');
         }
 
+        function highlightStationsOnMap(stationIds) {
+            const selectedIds = [...new Set(stationIds.map(String))];
+            const lowestId = String(stationIds[0]);
+            const highestId = String(stationIds[1]);
+            const selectedLocations = [];
+
+            document.querySelectorAll('[data-comparison-card]').forEach((card) => {
+                const cardIds = [card.dataset.lowestStation, card.dataset.highestStation].map(String);
+                card.classList.toggle('active', cardIds.every((id) => selectedIds.includes(id)));
+            });
+
+            resultButtons.forEach((button) => {
+                button.classList.toggle('active', selectedIds.includes(String(button.dataset.stationResult)));
+            });
+
+            stations.forEach((station) => {
+                const marker = markers[station.id];
+                if (!marker || !map) return;
+
+                const isSelected = selectedIds.includes(String(station.id));
+
+                if (isSelected && !map.hasLayer(marker)) marker.addTo(map);
+                if (!isSelected && map.hasLayer(marker)) marker.remove();
+
+                const element = marker.getElement();
+                const shape = element ? element.querySelector('.station-marker') : null;
+                if (shape) {
+                    shape.classList.toggle('active', isSelected);
+                    shape.classList.toggle('lowest-comparison', isSelected && String(station.id) === lowestId);
+                    shape.classList.toggle('highest-comparison', isSelected && String(station.id) === highestId);
+                }
+
+                if (isSelected) {
+                    selectedLocations.push([station.latitude, station.longitude]);
+                }
+            });
+
+            if (!map || !selectedLocations.length) return;
+
+            if (selectedLocations.length === 1) {
+                map.setView(selectedLocations[0], Math.max(map.getZoom(), 15), { animate: true });
+                return;
+            }
+
+            map.fitBounds(L.latLngBounds(selectedLocations).pad(0.45), { maxZoom: 15, animate: true });
+        }
+
         resultButtons.forEach((button) => {
             button.addEventListener('click', () => setActiveStation(button.dataset.stationResult, true));
+        });
+
+        priceComparison.addEventListener('click', (event) => {
+            const card = event.target.closest('[data-comparison-card]');
+            if (!card) return;
+
+            highlightStationsOnMap([card.dataset.lowestStation, card.dataset.highestStation]);
         });
 
         [searchInput, brandFilter, fuelFilter].forEach((control) => {
@@ -860,7 +1188,7 @@
             Object.values(markers).forEach((marker) => {
                 const element = marker.getElement();
                 const shape = element ? element.querySelector('.station-marker') : null;
-                if (shape) shape.classList.remove('active');
+                if (shape) shape.classList.remove('active', 'lowest-comparison', 'highest-comparison');
             });
         });
 
@@ -876,6 +1204,34 @@
 
         toggleResults.addEventListener('click', () => {
             setResultsPanelMinimized(!resultsPanel.classList.contains('collapsed'));
+        });
+
+        function setComparisonMinimized(isMinimized) {
+            priceComparisonSection.classList.toggle('collapsed', isMinimized);
+            toggleComparison.textContent = isMinimized ? '+' : '-';
+            toggleComparison.setAttribute('aria-expanded', String(!isMinimized));
+            toggleComparison.setAttribute(
+                'aria-label',
+                isMinimized ? 'Expand Price Comparison section' : 'Minimize Price Comparison section'
+            );
+        }
+
+        toggleComparison.addEventListener('click', () => {
+            setComparisonMinimized(priceComparisonSection.classList.contains('collapsed') === false);
+        });
+
+        function setStationsMinimized(isMinimized) {
+            stationsSection.classList.toggle('collapsed', isMinimized);
+            toggleStations.textContent = isMinimized ? '+' : '-';
+            toggleStations.setAttribute('aria-expanded', String(!isMinimized));
+            toggleStations.setAttribute(
+                'aria-label',
+                isMinimized ? 'Expand Stations section' : 'Minimize Stations section'
+            );
+        }
+
+        toggleStations.addEventListener('click', () => {
+            setStationsMinimized(stationsSection.classList.contains('collapsed') === false);
         });
 
         zoomIn.addEventListener('click', () => {

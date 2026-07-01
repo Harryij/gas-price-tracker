@@ -45,9 +45,18 @@ class StationSeeder extends Seeder
                 'longitude' => 122.08997666883874,
             ],
 
+                        [
+                'brand_id' => $petron->id,
+                'name' => 'Petron Veterans',
+                'address' => 'Veterans Avenue',
+                'city' => 'Zamboanga City',
+                'latitude' => 6.920036482692739,
+                'longitude' => 122.07926578031922,
+            ],
+
             [
                 'brand_id' => $petron->id,
-                'name' => 'Petron Gas Station',
+                'name' => 'Petron (MCLL Hwy)',
                 'address' => 'MCLL Highway',
                 'city' => 'Zamboanga City',
                 'latitude' => 6.927322822475103,
@@ -55,12 +64,57 @@ class StationSeeder extends Seeder
             ],
 
             [
-                'brand_id' => $caltex->id,
-                'name' => 'Caltex Veterans',
-                'address' => 'Veterans Avenue',
+                'brand_id' => $petron->id,
+                'name' => 'Petron (Fronting Baliwasan Brgy Hall)',
+                'address' => 'Baliwasan Crossing',
                 'city' => 'Zamboanga City',
-                'latitude' => 6.9184000,
-                'longitude' => 122.0738000,
+                'latitude' => 6.915981313682601,
+                'longitude' => 122.06015941983887,
+            ],
+
+            [
+                'brand_id' => $petron->id,
+                'name' => 'Petron (Gov Ramos Avenue)',
+                'address' => 'Governor Ramos Avenue',
+                'city' => 'Zamboanga City',
+                'latitude' => 6.930004081978395,
+                'longitude' => 122.06364420903266,
+            ],
+
+            [
+                'brand_id' => $petron->id,
+                'name' => 'Petron Tumaga',
+                'address' => 'Tumaga Road',
+                'city' => 'Zamboanga City',
+                'latitude' => 6.933786276583844,
+                'longitude' => 122.07871234825913,
+            ],
+
+            [
+                'brand_id' => $petron->id,
+                'name' => 'Petron (San Jose Road)',
+                'address' => 'San Jose Road',
+                'city' => 'Zamboanga City',
+                'latitude' => 6.908741012075714,
+                'longitude' => 122.0708741894429,
+            ],
+
+            [
+                'brand_id' => $petron->id,
+                'name' => 'Petron Centenarian',
+                'address' => 'Gov Camins Rd',
+                'city' => 'Zamboanga City',
+                'latitude' => 6.921508893033749,
+                'longitude' => 122.07716032483263,
+            ],
+
+            [
+                'brand_id' => $caltex->id,
+                'name' => 'Caltex Nuñez',
+                'address' => 'Vitaliano Agan Aveneu Extension',
+                'city' => 'Zamboanga City',
+                'latitude' => 6.925015186696649,
+                'longitude' => 122.07480331150636,
             ],
 
             [
