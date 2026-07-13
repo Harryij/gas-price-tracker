@@ -30,10 +30,19 @@ class StationSeeder extends Seeder
             [
                 'brand_id' => $shell->id,
                 'name' => 'Shell Veterans',
-                'address' => 'Veterans Avenue',
+                'address' => 'Veterans Avenue Extension',
                 'city' => 'Zamboanga City',
                 'latitude' => 6.9147843372218984,
                 'longitude' => 122.07974308808545,
+            ],
+
+            [
+                'brand_id' => $shell->id,
+                'name' => 'Shell Veterans Avenue',
+                'address' => 'Veterans Avenue',
+                'city' => 'Zamboanga City',
+                'latitude' => 6.913544107790088,
+                'longitude' => 122.07946638171265,
             ],
 
             [
