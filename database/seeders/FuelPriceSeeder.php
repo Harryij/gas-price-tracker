@@ -18,6 +18,7 @@ class FuelPriceSeeder extends Seeder
             'Shell Divisoria' => ['Regular' => 63.25, 'Premium' => 68.40, 'Diesel' => 58.70],
             'Shell Veterans Extension' => ['Regular' => 63.55, 'Premium' => 58.75, 'Diesel' => 58.95],
             'Shell Veterans Avenue' => ['Regular' => 63.55, 'Premium' => 58.75, 'Diesel' => 58.95],
+            'Shell Nuñez Extension' => ['Regular' => 63.55, 'Premium' => 58.75, 'Diesel' => 58.95],
             'Petron Tetuan' => ['Regular' => 62.90, 'Premium' => 67.80, 'Diesel' => 58.40],
             'Petron Tumaga' => ['Regular' => 82.90, 'Premium' => 67.80, 'Diesel' => 58.40],
             'Petron (Gov Ramos Avenue)' => ['Regular' => 62.90, 'Premium' => 67.80, 'Diesel' => 58.40],

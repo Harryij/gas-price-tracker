@@ -46,6 +46,15 @@ class StationSeeder extends Seeder
             ],
 
             [
+                'brand_id' => $shell->id,
+                'name' => 'Shell Nuñez Extension',
+                'address' => 'Nuñez Extension',
+                'city' => 'Zamboanga City',
+                'latitude' => 6.916178904923128,
+                'longitude' => 122.07607881214317,
+            ],
+
+            [
                 'brand_id' => $petron->id,
                 'name' => 'Petron Tetuan',
                 'address' => 'Tetuan Highway',
