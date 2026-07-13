@@ -29,7 +29,7 @@ class StationSeeder extends Seeder
 
             [
                 'brand_id' => $shell->id,
-                'name' => 'Shell Veterans',
+                'name' => 'Shell Veterans Avenue Extension',
                 'address' => 'Veterans Avenue Extension',
                 'city' => 'Zamboanga City',
                 'latitude' => 6.9147843372218984,
@@ -52,6 +52,33 @@ class StationSeeder extends Seeder
                 'city' => 'Zamboanga City',
                 'latitude' => 6.916178904923128,
                 'longitude' => 122.07607881214317,
+            ],
+
+            [
+                'brand_id' => $shell->id,
+                'name' => 'Shell Canelar',
+                'address' => 'Canelar',
+                'city' => 'Zamboanga City',
+                'latitude' => 6.912618226244901,
+                'longitude' => 122.07249202983515,
+            ],
+
+            [
+                'brand_id' => $shell->id,
+                'name' => 'Shell Governor Alvarez',
+                'address' => 'Governor Alvarez',
+                'city' => 'Zamboanga City',
+                'latitude' => 6.909428969648764,
+                'longitude' => 122.07045663151824,
+            ],
+
+            [
+                'brand_id' => $shell->id,
+                'name' => 'Shell Governor Camins Avenue',
+                'address' => 'Governor Camins Avenue',
+                'city' => 'Zamboanga City',
+                'latitude' => 6.919858083784958,
+                'longitude' => 122.06729579265048,
             ],
 
             [

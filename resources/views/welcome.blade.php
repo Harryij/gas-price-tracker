@@ -758,7 +758,7 @@
 
         <section class="results-panel" aria-label="Station results">
             <div class="results-header">
-                <h1>Gas Price Dashboard</h1>
+                <h1>Dashboard</h1>
                 <button class="collapse-results" id="toggleResults" type="button" aria-label="Minimize Gas Price Tracker card" aria-expanded="true">-</button>
                 <p><span id="resultCount">{{ $mapStations->count() }}</span> stations in Zamboanga City. Click a marker or station to view details.</p>
             </div>
